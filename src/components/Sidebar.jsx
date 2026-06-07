@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../AppContext';
 import { useAuth } from '../auth/AuthContext';
+import favicon from "../img/favicon.png";
 
 const navItems = [
   { page: '/dashboard',     icon: 'fas fa-chart-line',      label: 'Dashboard' },
@@ -81,20 +82,15 @@ export default function Sidebar() {
 
         /* ── Logo ── */
         .sidebar-logo {
-          display: flex;
           align-items: center;
-          gap: 10px;
           padding: 24px 20px 20px;
           position: relative;
           z-index: 1;
         }
 
         .sidebar-logo img {
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          object-fit: cover;
-          box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 4px 12px rgba(0,0,0,.4);
+          width: 150px;
+          height: 100px;
         }
 
         .sidebar-logo-text {
@@ -272,14 +268,13 @@ export default function Sidebar() {
       <div className="sidebar">
         {/* Logo */}
         <div className="sidebar-logo">
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 0 0 1px rgba(255,255,255,.1), 0 4px 12px rgba(0,0,0,.4)' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#0d1f14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <polyline points="9 22 9 12 15 12 15 22" stroke="#0d1f14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          <div>
+           <img
+      src={favicon}
+      alt="Logo AlmoxApp"
+    />
           </div>
           <div>
-            <div className="sidebar-logo-text">AlmoxApp</div>
             <div className="sidebar-logo-sub">Controle de Estoque</div>
           </div>
         </div>
