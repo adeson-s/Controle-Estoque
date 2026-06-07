@@ -4,48 +4,41 @@ import { useApp } from '../AppContext';
 import PageHeader from '../components/PageHeader';
 import SheetsService from '../services/SheetsService';
 
-// ─── Kits inline (equivalente ao kits.json) ───────────────────────────────────
+// ─── Kits inline ─────────────────────────────────────────────────────────────
 
 const KITS = {
   BASE: {
     caixa_box: [
-      { material: 'ABRAÇADEIRA NYLON 100 X 2,5mm',                            padrao: 20 },
-      { material: 'ABRAÇADEIRA DE IDENTIFICAÇÃO DE FIBRA OPTICA',              padrao: 5  },
-      { material: 'CONECTOR FAST SC/APC - SM (Q1) NAZDA P/ FIBRA OPTICA',     padrao: 10 },
-      { material: 'EMENDA APC',                                                padrao: 6  },
-      { material: 'GRAMPO CLAMP C2 - FTTH',                                    padrao: 30 },
-      { material: 'BUCHA 8',                                                   padrao: 1  },
-      { material: 'PARAFUSO 8',                                                padrao: 1  },
-      { material: 'MARCADOR PARA RETRO PROJETOR',                              padrao: 1  },
-      { material: 'CORDAO OPTICO SC UPC/SC APC 2M',                           padrao: 5  },
-      { material: 'CORDAO OPTICO SC APC/SC APC 2M',                           padrao: 5  },
-      { material: 'CAIXA TERMINAÇÃO PTO FTTH',                                 padrao: 4  },
-      { material: 'BUCHA DE ACABAMENTO',                                       padrao: 8  },
-      { material: 'PROTETOR DE EMENDA JACARÉ',                                 padrao: 2  },
+      { material: 'Conector RJ45 Cat6',        padrao: 10 },
+      { material: 'Patch Cord 1m Cat6',         padrao: 5  },
+      { material: 'Patch Cord 3m Cat6',         padrao: 3  },
+      { material: 'Fita Isolante',              padrao: 2  },
+      { material: 'Abraçadeira Nylon 200mm',    padrao: 20 },
+      { material: 'Etiqueta de Identificação',  padrao: 10 },
     ],
     caixa_ferragem: [
-      { material: 'ALÇA PREFORMADA P/ FIO FE 100/160', padrao: 50 },
-      { material: 'ABRAÇADEIRA BAP',                   padrao: 4  },
-      { material: 'PARAFUSO DE BAP',                   padrao: 4  },
-      { material: 'AGFE-PRO (ANEL)',                   padrao: 8  },
+      { material: 'Parafuso M6x20',       padrao: 20 },
+      { material: 'Tampa de Caixa 4x4',   padrao: 5  },
+      { material: 'Caixa de Passagem 4x4', padrao: 3 },
     ],
-    bobina:       [{ material: 'Bobina',       padrao: 1 }],
-    equipamentos: [{ material: 'Equipamentos', padrao: 1 }],
+    bobina:       [{ material: 'Cabo UTP Cat6',       padrao: 50 }],
+    equipamentos: [{ material: 'Roteador WiFi AC1200', padrao: 1  }],
   },
-  Cidades: {
-    niteroi: {
+  Filiais: {
+    norte: {
       override: {
-        caixa_box: [{ material: 'SLIMBOX - CEIF 08 FLEX - 1X8 - SC/APC', padrao: 2 }],
+        caixa_box: [{ material: 'Switch 8 Portas', padrao: 1 }],
       },
-    }
+    },
   },
 };
 
-// Mapeamento cidade → chave do JSON
+// Mapeamento filial → chave do JSON
 const ESTOQUES = [
-  { label: 'MARICÁ',       key: 'marica'        },
-  { label: 'ITABORAÍ',     key: 'itaborai'      },  
-  { label: 'NITERÓI',      key: 'niteroi'       },
+  { label: 'FILIAL CENTRO', key: 'centro' },
+  { label: 'FILIAL NORTE',  key: 'norte'  },
+  { label: 'FILIAL SUL',    key: 'sul'    },
+  { label: 'FILIAL LESTE',  key: 'leste'  },
 ];
 
 // Rótulos amigáveis das seções
@@ -100,7 +93,7 @@ function newId() { return _nextId++; }
 
 function montarItensDoKit(cidadeKey) {
   const base   = KITS.BASE;
-  const cidade = KITS.Cidades?.[cidadeKey] || {};
+  const cidade = KITS.Filiais?.[cidadeKey] || {};
   const override = cidade.override || {};
 
   const itens = [];

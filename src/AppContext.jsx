@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 
 import SheetsService from './services/SheetsService';
+import MockService from './services/MockService';
 import { useAuth } from './auth/AuthContext';
 
 import * as XLSX from 'xlsx';
@@ -31,12 +32,22 @@ export function AppProvider({ children }) {
   const autoRefreshRef = useRef(null);
 
   /* =========================================================
+     SERVIÇO ATIVO
+  ========================================================= */
+
+  function getService(u) {
+    return u?.demo ? MockService : SheetsService;
+  }
+
+  /* =========================================================
      CARREGAR DADOS
   ========================================================= */
 
   const carregarDados = useCallback(async () => {
 
-    if (!SheetsService.isConfigured()) {
+    const service = getService(usuario);
+
+    if (!service.isConfigured()) {
       return;
     }
 
@@ -44,19 +55,13 @@ export function AppProvider({ children }) {
 
     try {
 
-      // limpa cache antigo
-      SheetsService.clearCache();
+      if (!usuario?.demo) SheetsService.clearCache();
 
-      const novos = await SheetsService.carregarTodos();
+      const novos = await service.carregarTodos();
 
       setDados(novos);
 
       setSyncStatus('synced');
-
-      console.log(
-        'Dados carregados da planilha:',
-        usuario?.sheetId
-      );
 
     } catch (err) {
 
@@ -65,7 +70,7 @@ export function AppProvider({ children }) {
       setSyncStatus('error');
     }
 
-  }, [usuario?.sheetId]);
+  }, [usuario?.sheetId, usuario?.demo]);
 
   /* =========================================================
      AUTO REFRESH
@@ -73,15 +78,12 @@ export function AppProvider({ children }) {
 
   const iniciarAutoRefresh = useCallback(() => {
 
-    // limpa refresh antigo
     if (autoRefreshRef.current) {
       clearInterval(autoRefreshRef.current);
     }
 
     autoRefreshRef.current = setInterval(() => {
-
       carregarDados();
-
     }, SheetsService.CONFIG.AUTO_REFRESH);
 
   }, [carregarDados]);
@@ -94,7 +96,6 @@ export function AppProvider({ children }) {
 
     async function atualizarSistema() {
 
-      // sem usuário
       if (!usuario) {
 
         setDados({
@@ -110,40 +111,30 @@ export function AppProvider({ children }) {
         return;
       }
 
+      const service = getService(usuario);
+
       try {
 
-        console.log(
-          'Trocando para planilha:',
-          usuario.sheetId
-        );
+        if (!usuario.demo) SheetsService.clearCache();
 
-        // limpa cache
-        SheetsService.clearCache();
-
-        // limpa dados antigos imediatamente
         setDados({
           movimentacoes: [],
           tecnicos: [],
           produtos: [],
         });
 
-        // carrega novos dados
-        const novosDados =
-          await SheetsService.carregarTodos();
+        const novosDados = await service.carregarTodos();
 
         setDados(novosDados);
 
         setSyncStatus('synced');
 
-        // reinicia auto refresh
         if (autoRefreshRef.current) {
           clearInterval(autoRefreshRef.current);
         }
 
         autoRefreshRef.current = setInterval(() => {
-
           carregarDados();
-
         }, SheetsService.CONFIG.AUTO_REFRESH);
 
       } catch (err) {
@@ -157,13 +148,12 @@ export function AppProvider({ children }) {
     atualizarSistema();
 
     return () => {
-
       if (autoRefreshRef.current) {
         clearInterval(autoRefreshRef.current);
       }
     };
 
-  }, [usuario?.sheetId]);
+  }, [usuario?.sheetId, usuario?.demo]);
 
   /* =========================================================
      EXPORTAR EXCEL
@@ -233,7 +223,6 @@ export function AppProvider({ children }) {
     else if (tipo === 'estoque') {
 
       const criticos = dados.produtos.filter(p =>
-
         (parseInt(p['ESTOQUE ATUAL']) || 0) <=
         (parseInt(p['ESTOQUE MÍNIMO']) || 0) * 2
       );
@@ -265,6 +254,8 @@ export function AppProvider({ children }) {
      PROVIDER
   ========================================================= */
 
+  const activeService = getService(usuario);
+
   return (
 
     <AppContext.Provider
@@ -282,7 +273,7 @@ export function AppProvider({ children }) {
 
         gerarRelatorio,
 
-        SheetsService,
+        SheetsService: activeService,
       }}
     >
 

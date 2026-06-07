@@ -273,22 +273,16 @@ export default function NovaSaida() {
 
   // Auto-preenche placa ao selecionar técnico
   useEffect(() => {
-    const tec = tecnicos.find(t => (t['NOME COMPLETO'] || t.NOME) === tecnico);
+    const tec = tecnicos.find(t => (t['NOME COMPLETO'] || t.TÉCNICO) === tecnico);
     if (tec) setPlaca(tec.PLACA || '');
   }, [tecnico, tecnicos]);
 
   // Mapa de estoque calculado
- const estoqueMap = {};
+  const estoqueMap = {};
 
-produtos.forEach(p => {
-  const nome = p.PRODUTO;
-
-  const estoque = Number(
-    p['ESTOQUE_SALA'] || 0
-  );
-
-  estoqueMap[nome] = estoque;
-});
+  produtos.forEach(p => {
+    estoqueMap[p.PRODUTO] = Number(p['ESTOQUE ATUAL'] || 0);
+  });
 
   // Produtos filtrados pela busca
   const prodsFiltrados = busca
@@ -327,7 +321,8 @@ produtos.forEach(p => {
     setShowQR(false);
     const match = produtos.find(p =>
       p.PRODUTO === rawValue ||
-      (p.CODIGO && p.CODIGO === rawValue) ||
+      p.QR_CODE === rawValue ||
+      p['CÓDIGO'] === rawValue ||
       rawValue.toLowerCase().includes(p.PRODUTO.toLowerCase())
     );
     if (match) {

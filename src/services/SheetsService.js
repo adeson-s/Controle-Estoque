@@ -1,7 +1,6 @@
-// Feito por Adeson Souza
 // Serviço de integração com Google Sheets
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8er9VsbTFFLSu27waNsh270sPvlpUCp95iN8M_Zahc5px3XtWNO0ZOwgaYL2Zjt5w/exec";
+const SCRIPT_URL = import.meta.env.VITE_SCRIPT_URL || '';
 
 const CONFIG = {
   SHEETS: {
@@ -12,10 +11,9 @@ const CONFIG = {
 
   AUTO_REFRESH: 30000,
 
-  // Agora o sheetId vem do usuário logado
   sheetId: '',
 
-  apiKey: 'AIzaSyCR8ARygudTzb3_L2D4VUaH6V9zWPOysik',
+  apiKey: import.meta.env.VITE_GOOGLE_API_KEY || '',
 };
 
 const cache = {};
@@ -147,6 +145,8 @@ async function carregarTodos() {
 ========================================================= */
 
 async function salvarMovimentacao(dados) {
+  if (!SCRIPT_URL) return { success: true };
+
   const formData = new URLSearchParams();
 
   formData.append(
@@ -169,6 +169,8 @@ async function salvarMovimentacao(dados) {
 ========================================================= */
 
 async function salvarProduto(produto) {
+  if (!SCRIPT_URL) return { success: true };
+
   const formData = new URLSearchParams();
 
   formData.append(
@@ -194,6 +196,8 @@ async function salvarProduto(produto) {
 ========================================================= */
 
 async function salvarConferencia(relatorio) {
+  if (!SCRIPT_URL) return { success: true };
+
   const formData = new URLSearchParams();
 
   formData.append(
@@ -220,6 +224,8 @@ async function salvarConferencia(relatorio) {
 
 async function listarConferencias() {
   const sheetId = getSheetId();
+
+  if (!sheetId || !CONFIG.apiKey) return [];
 
   const url =
     `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/CONFERENCIAS?key=${CONFIG.apiKey}&t=${Date.now()}`;
@@ -262,6 +268,8 @@ async function listarConferencias() {
 ========================================================= */
 
 async function buscarUsuarios() {
+  if (!SCRIPT_URL) return [];
+
   const sheetId = getSheetId();
 
   const url =
@@ -279,6 +287,8 @@ async function buscarUsuarios() {
 }
 
 async function salvarUsuario(dados) {
+  if (!SCRIPT_URL) return { success: true };
+
   const formData = new URLSearchParams();
 
   formData.append(
@@ -300,6 +310,8 @@ async function salvarUsuario(dados) {
 }
 
 async function excluirUsuario(username) {
+  if (!SCRIPT_URL) return { success: true };
+
   const formData = new URLSearchParams();
 
   formData.append(

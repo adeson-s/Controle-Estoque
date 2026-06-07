@@ -115,7 +115,7 @@ export default function Produtos() {
       (p.PRODUTO  || '').toLowerCase().includes(texto) ||
       (p.QR_CODE  || '').toLowerCase().includes(texto) ||
       (p['CÓDIGO'] || '').toLowerCase().includes(texto);
-    const atual   = parseInt(p['ESTOQUE_GALPAO'])  || 0;
+    const atual   = parseInt(p['ESTOQUE ATUAL'])  || 0;
     const minimo  = parseInt(p['ESTOQUE MÍNIMO']) || 0;
     const st      = statusEstoque(atual, minimo);
     const matchStatus  = filtroStatus  === 'TODOS' || st.text === filtroStatus;
@@ -125,9 +125,9 @@ export default function Produtos() {
 
   const contadores = {
     TODOS:   produtos.length,
-    OK:      produtos.filter(p => statusEstoque(parseInt(p['ESTOQUE_GALPAO'])||0, parseInt(p['ESTOQUE MÍNIMO'])||0).text === 'OK').length,
-    ALERTA:  produtos.filter(p => statusEstoque(parseInt(p['ESTOQUE_GALPAO'])||0, parseInt(p['ESTOQUE MÍNIMO'])||0).text === 'ALERTA').length,
-    CRÍTICO: produtos.filter(p => statusEstoque(parseInt(p['ESTOQUE_GALPAO'])||0, parseInt(p['ESTOQUE MÍNIMO'])||0).text === 'CRÍTICO').length,
+    OK:      produtos.filter(p => statusEstoque(parseInt(p['ESTOQUE ATUAL'])||0, parseInt(p['ESTOQUE MÍNIMO'])||0).text === 'OK').length,
+    ALERTA:  produtos.filter(p => statusEstoque(parseInt(p['ESTOQUE ATUAL'])||0, parseInt(p['ESTOQUE MÍNIMO'])||0).text === 'ALERTA').length,
+    CRÍTICO: produtos.filter(p => statusEstoque(parseInt(p['ESTOQUE ATUAL'])||0, parseInt(p['ESTOQUE MÍNIMO'])||0).text === 'CRÍTICO').length,
   };
 
   return (
@@ -222,7 +222,7 @@ export default function Produtos() {
               </thead>
               <tbody>
                 {listaFiltrada.map((p, i) => {
-                  const atual   = parseInt(p['ESTOQUE_GALPAO'])  || 0;
+                  const atual   = parseInt(p['ESTOQUE ATUAL'])  || 0;
                   const minimo  = parseInt(p['ESTOQUE MÍNIMO']) || 0;
                   const st      = statusEstoque(atual, minimo);
                   const pct     = minimo > 0 ? Math.min((atual / (minimo * 3)) * 100, 100) : 100;

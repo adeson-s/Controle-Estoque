@@ -6,30 +6,10 @@ export default function PageHeader({ title, subtitle }) {
 
   const { carregarDados } = useApp();
 
-  const { usuario, logout } = useAuth();
+  const { usuario, logout, trocarEstoque } = useAuth();
 
   const [refreshing, setRefreshing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  /* =========================================================
-     TROCAR ESTOQUE
-  ========================================================= */
-
-  function trocarEstoque(novoEstoque) {
-    try {
-      const raw = localStorage.getItem('leste_auth_session');
-      if (!raw) return;
-
-      const sessao = JSON.parse(raw);
-      sessao.usuario.estoqueAtual = novoEstoque;
-      sessao.usuario.sheetId = CIDADES[novoEstoque]?.sheetId || '';
-
-      localStorage.setItem('leste_auth_session', JSON.stringify(sessao));
-      window.location.reload();
-    } catch (err) {
-      console.error(err);
-    }
-  }
 
   /* =========================================================
      REFRESH
@@ -431,7 +411,7 @@ export default function PageHeader({ title, subtitle }) {
             <div className="ph-user-col">
               <span className="ph-user-name">{usuario?.name || 'Usuário'}</span>
               <span className="ph-user-role">
-                {usuario?.role === 'admin' ? 'Administrador' : 'Auxiliar'}
+                {usuario?.role === 'gerente' ? 'Gerente' : usuario?.role === 'supervisor' ? 'Supervisor' : 'Auxiliar'}
               </span>
             </div>
 

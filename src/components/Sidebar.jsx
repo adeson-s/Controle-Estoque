@@ -24,7 +24,7 @@ export default function Sidebar() {
   const navigate  = useNavigate();
   const location  = useLocation();
   const { syncStatus } = useApp();
-  const { isAdmin } = useAuth();
+  const { isGerente } = useAuth();
 
   const isActive = (page) =>
     location.pathname === page ||
@@ -272,13 +272,15 @@ export default function Sidebar() {
       <div className="sidebar">
         {/* Logo */}
         <div className="sidebar-logo">
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNy2vYtxATpymkS7R_AgJ0cmO-z6eKd6AsMA&s"
-            alt="Logo Leste"
-          />
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 0 0 1px rgba(255,255,255,.1), 0 4px 12px rgba(0,0,0,.4)' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#0d1f14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <polyline points="9 22 9 12 15 12 15 22" stroke="#0d1f14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
           <div>
-            <div className="sidebar-logo-text">Leste</div>
-            <div className="sidebar-logo-sub">Gestão de Estoque</div>
+            <div className="sidebar-logo-text">AlmoxApp</div>
+            <div className="sidebar-logo-sub">Controle de Estoque</div>
           </div>
         </div>
 
@@ -288,7 +290,7 @@ export default function Sidebar() {
         {/* Nav */}
         <nav className="sidebar-nav">
           {navItems
-  .filter(item => !item.adminOnly || isAdmin)
+  .filter(item => !item.adminOnly || isGerente)
   .map((item) => (
 
             <button

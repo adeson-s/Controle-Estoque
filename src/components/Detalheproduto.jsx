@@ -298,11 +298,11 @@ export default function DetalheProduto({ produto, onClose, onIrTransferencia, on
     console.log('QR lido:', code);
   }
 
-  const nomeProd = produto?.PRODUTO || '';  
-  const estoqueSala  = parseInt(produto?.['ESTOQUE_SALA']) || calcEstoqueTotal(movimentacoes, nomeProd);
-  const estoqueAtual  = parseInt(produto?.['ESTOQUE_GALPAO']) || 0;
+  const nomeProd = produto?.PRODUTO || '';
+  const estoqueAtual  = parseInt(produto?.['ESTOQUE ATUAL']) || 0;
   const estoqueMinimo = parseInt(produto?.['ESTOQUE MÍNIMO']) || 0;
-  const estoqueDispo = parseInt(produto?.['ESTOQUE_GALPAO']) || 0;
+  const estoqueSala   = estoqueAtual;
+  const estoqueDispo  = estoqueAtual;
   const status = statusEstoque(estoqueAtual, estoqueMinimo);
 
   // Abrir edição
@@ -310,7 +310,7 @@ export default function DetalheProduto({ produto, onClose, onIrTransferencia, on
     setFormEdit({
       nome:        produto.PRODUTO           || '',
       unidade:     produto.UNIDADE           || '',
-      estoque:     produto['ESTOQUE_GALPAO']  || '',
+      estoque:     produto['ESTOQUE ATUAL']  || '',
       minimo:      produto['ESTOQUE MÍNIMO'] || '',
       codigoBarra: produto['CÓDIGO']         || '',
     });
@@ -482,10 +482,6 @@ export default function DetalheProduto({ produto, onClose, onIrTransferencia, on
                   <div style={{ ...s.statVal, color: status.cor }}>{estoqueAtual}</div>
                   <div style={{ ...s.statLabel, color: status.cor }}>Estoque no Galpão</div>
                 </div>
-                 {/* <div style={{ ...s.statCard, borderColor:'#e0e0e0', background:'var(--color-background-secondary,#f9f9f9)' }}>
-                  <div style={{ ...s.statVal, color:'#888' }}>{estoqueMinimo}</div>
-                  <div style={s.statLabel}>Mínimo</div>
-                </div> */}
                 <div style={{ ...s.statCard, borderColor:'#185FA530', background:'#185FA508' }}>
                   <div style={{ ...s.statVal, color:'#185FA5' }}>{Math.max(0, estoqueAtual + estoqueSala )}</div>
                   <div style={{ ...s.statLabel, color:'#185FA5' }}>Disponível</div>

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth, CIDADES, PERMISSOES } from '../auth/AuthContext';
+import { useApp } from '../AppContext';
 import PageHeader from '../components/PageHeader';
-import SheetsService from '../services/SheetsService';
 
 /* ─────────────────────────────────────────────
    HELPERS
@@ -21,20 +21,20 @@ function iniciaisNome(nome = '') {
 
 function corCidade(cidade) {
   const map = {
-    MARICA: '#3B6D11',
-    NITEROI: '#085041',
-    ITABORAI: '#D97706',
-    PIRATININGA: '#7C3AED',
+    CENTRO:  '#3B6D11',
+    NORTE:   '#085041',
+    SUL:     '#D97706',
+    LESTE:   '#7C3AED',
   };
   return map[cidade] || '#888';
 }
 
 function bgCidade(cidade) {
   const map = {
-    MARICA: '#EAF3DE',
-    NITEROI: '#E1F5EE',
-    ITABORAI: '#FEF3C7',
-    PIRATININGA: '#EDE9FE',
+    CENTRO:  '#EAF3DE',
+    NORTE:   '#E1F5EE',
+    SUL:     '#FEF3C7',
+    LESTE:   '#EDE9FE',
   };
   return map[cidade] || '#f0f0f0';
 }
@@ -135,8 +135,8 @@ const s = {
     display: 'inline-flex',
     padding: '4px 10px',
     borderRadius: 999,
-    background: role === 'admin' ? '#EAF3DE' : '#f3f4f6',
-    color: role === 'admin' ? '#3B6D11' : '#555',
+    background: role === 'gerente' ? '#EAF3DE' : role === 'supervisor' ? '#EFF6FF' : '#f3f4f6',
+    color: role === 'gerente' ? '#3B6D11' : role === 'supervisor' ? '#1D4ED8' : '#555',
     fontWeight: 700,
     fontSize: 11,
   }),
@@ -410,7 +410,8 @@ function ModalUsuario({ usuario, onSalvar, onFechar }) {
                 style={s.formSelect}
               >
                 <option value="auxiliar">Auxiliar</option>
-                <option value="admin">Admin</option>
+                <option value="supervisor">Supervisor</option>
+                <option value="gerente">Gerente</option>
               </select>
             </div>
 
@@ -474,6 +475,7 @@ function ModalUsuario({ usuario, onSalvar, onFechar }) {
 
 export default function GerenciamentoUsuarios() {
   const { usuario: usuarioLogado } = useAuth();
+  const { SheetsService } = useApp();
 
   const [usuarios, setUsuarios] = useState([]);
   const [modal, setModal] = useState(null);
@@ -485,7 +487,7 @@ export default function GerenciamentoUsuarios() {
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  }, [SheetsService]);
 
   useEffect(() => {
     carregarUsuarios();
@@ -519,7 +521,7 @@ export default function GerenciamentoUsuarios() {
     }
   }
 
-  if (!usuarioLogado || usuarioLogado.role !== 'admin') {
+  if (!usuarioLogado || usuarioLogado.role !== 'gerente') {
     return null;
   }
 

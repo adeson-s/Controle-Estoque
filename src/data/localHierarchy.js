@@ -3,9 +3,9 @@
 
 export const HIERARCHY = [
   {
-    id: 'MARICA',
-    label: 'Maricá',
-    icon: '🏠',
+    id: 'CENTRO',
+    label: 'Filial Centro',
+    icon: '🏢',
     tipo: 'cidade',
     children: [
       {
@@ -13,7 +13,7 @@ export const HIERARCHY = [
         label: 'Sala',
         icon: '🗄️',
         tipo: 'ambiente',
-        children: [1, 2,].map(e => ({
+        children: [1, 2].map(e => ({
           id: `SALA_E${e}`,
           label: `Estante ${e}`,
           icon: '📦',
@@ -101,22 +101,22 @@ export const HIERARCHY = [
     ],
   },
   {
-    id: 'ITABORAI',
-    label: 'Itaboraí',
+    id: 'NORTE',
+    label: 'Filial Norte',
     icon: '🏭',
     tipo: 'cidade',
     children: [],
   },
   {
-    id: 'SANTA_ROSA',
-    label: 'Santa Rosa',
+    id: 'SUL',
+    label: 'Filial Sul',
     icon: '🏭',
     tipo: 'cidade',
     children: [],
   },
   {
-    id: 'PIRATININGA',
-    label: 'Piratininga',
+    id: 'LESTE',
+    label: 'Filial Leste',
     icon: '🏭',
     tipo: 'cidade',
     children: [],

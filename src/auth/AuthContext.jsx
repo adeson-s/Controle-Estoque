@@ -8,41 +8,49 @@ import React, {
   useCallback
 } from 'react';
 
-const API_KEY =
-  "AIzaSyCR8ARygudTzb3_L2D4VUaH6V9zWPOysik";
+const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || '';
+const MASTER_SHEET_ID = import.meta.env.VITE_MASTER_SHEET_ID || '';
 
 /* =========================================================
-   PLANILHA MASTER (USUÁRIOS)
-========================================================= */
-
-const MASTER_SHEET_ID =
-  '1-Ih5DR3RBk0rGb3ZfMVZhZHXlOf_ez1vu7kyI4mW_j0';
-
-/* =========================================================
-   ESTOQUES / CIDADES
+   FILIAIS
 ========================================================= */
 
 export const CIDADES = {
 
-  ITABORAI: {
-    label: 'Itaboraí',
-    sheetId: '1f-tVaomtn0WvVMR6AleEa5npzFs7KUhwvib8-wEmIcY'
-  },
-  
-  MARICA: {
-    label: 'Maricá',
-    sheetId: '1-Ih5DR3RBk0rGb3ZfMVZhZHXlOf_ez1vu7kyI4mW_j0'
+  CENTRO: {
+    label: 'Filial Centro',
+    sheetId: import.meta.env.VITE_SHEET_CENTRO || '',
   },
 
-  SANTAROSA: {
-    label: 'Santa Rosa',
-    sheetId: '1WiDxRVQ6Jd_mTHfFDrU-StJRGVEDws033DROH4D4J8U'
+  NORTE: {
+    label: 'Filial Norte',
+    sheetId: import.meta.env.VITE_SHEET_NORTE || '',
   },
-  
-  PIRATININGA: {
-    label: 'Piratininga',
-    sheetId: '1RzEMh6GBJA8SbKFkcLVqkgatgsZHhzTwBaJIvEnT67E'
+
+  SUL: {
+    label: 'Filial Sul',
+    sheetId: import.meta.env.VITE_SHEET_SUL || '',
   },
+
+  LESTE: {
+    label: 'Filial Leste',
+    sheetId: import.meta.env.VITE_SHEET_LESTE || '',
+  },
+};
+
+/* =========================================================
+   USUÁRIO DEMO
+========================================================= */
+
+const DEMO_USER = {
+  username: 'demo',
+  name: 'Admin Demo',
+  role: 'gerente',
+  estoquesPermitidos: ['CENTRO', 'NORTE', 'SUL', 'LESTE'],
+  estoqueAtual: 'CENTRO',
+  sheetId: 'demo',
+  global: true,
+  demo: true,
 };
 
 /* =========================================================
@@ -107,9 +115,9 @@ export const PERMISSOES = {
    SESSION
 ========================================================= */
 
-const SESSION_KEY = 'leste_auth_session';
+const SESSION_KEY = 'almox_auth_session';
 
-const SESSION_HOURS = 8;
+const SESSION_HOURS = Number(import.meta.env.VITE_SESSION_HOURS) || 8;
 
 /* =========================================================
    HELPERS
@@ -118,8 +126,7 @@ const SESSION_HOURS = 8;
 function lerSessaoSincrona() {
   try {
 
-    const raw =
-      localStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY);
 
     if (!raw) return null;
 
@@ -140,11 +147,24 @@ function lerSessaoSincrona() {
   }
 }
 
+function salvarSessao(usuario) {
+  localStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify({
+      usuario,
+      expiraEm: Date.now() + SESSION_HOURS * 3600 * 1000,
+      loginEm: Date.now(),
+    })
+  );
+}
+
 /* =========================================================
-   BUSCAR USUÁRIO
+   BUSCAR USUÁRIO (Google Sheets)
 ========================================================= */
 
 async function buscarUsuario(username, password) {
+
+  if (!API_KEY || !MASTER_SHEET_ID) return null;
 
   try {
 
@@ -159,65 +179,33 @@ async function buscarUsuario(username, password) {
 
     const valores = data.values || [];
 
-    if (valores.length === 0) {
-      return null;
-    }
-
-    /* =====================================================
-       CABEÇALHOS
-    ===================================================== */
+    if (valores.length === 0) return null;
 
     const headers =
-      valores[0].map(h =>
-        String(h).toUpperCase().trim()
-      );
+      valores[0].map(h => String(h).toUpperCase().trim());
 
     const usuarios =
       valores.slice(1).map(row => {
-
         const obj = {};
-
         headers.forEach((h, i) => {
           obj[h] = String(row[i] ?? '').trim();
         });
-
         return obj;
       });
 
-    /* =====================================================
-       LOCALIZA USUÁRIO
-    ===================================================== */
-
     const found = usuarios.find(u =>
-
-      u.USERNAME?.toLowerCase() ===
-      username.toLowerCase()
-
-      &&
-
-      String(u.PASSWORD) ===
-      String(password)
-
-      &&
-
-      u.ATIVO !== 'NAO'
+      u.USERNAME?.toLowerCase() === username.toLowerCase()
+      && String(u.PASSWORD) === String(password)
+      && u.ATIVO !== 'NAO'
     );
 
     if (!found) return null;
 
-    /* =====================================================
-       ESTOQUES
-    ===================================================== */
-
     let estoquesPermitidos = [];
 
     if (found.ESTOQUES === '*') {
-
-      estoquesPermitidos =
-        Object.keys(CIDADES);
-
+      estoquesPermitidos = Object.keys(CIDADES);
     } else {
-
       estoquesPermitidos =
         String(found.ESTOQUES || '')
           .split(',')
@@ -225,38 +213,20 @@ async function buscarUsuario(username, password) {
           .filter(Boolean);
     }
 
-    /* =====================================================
-       ESTOQUE ATUAL
-    ===================================================== */
-
-    const estoqueAtual =
-      estoquesPermitidos[0] || null;
+    const estoqueAtual = estoquesPermitidos[0] || null;
 
     const sheetId =
-      estoqueAtual
-        ? CIDADES[estoqueAtual]?.sheetId
-        : null;
+      estoqueAtual ? CIDADES[estoqueAtual]?.sheetId : null;
 
     return {
-
-      username:
-        found.USERNAME,
-
-      name:
-        found.NAME,
-
-      role:
-        (found.ROLE || 'auxiliar')
-          .toLowerCase(),
-
+      username: found.USERNAME,
+      name: found.NAME,
+      role: (found.ROLE || 'auxiliar').toLowerCase(),
       estoquesPermitidos,
-
       estoqueAtual,
-
       sheetId,
-
-      global:
-        found.ESTOQUES === '*',
+      global: found.ESTOQUES === '*',
+      demo: false,
     };
 
   } catch (_) {
@@ -269,8 +239,7 @@ async function buscarUsuario(username, password) {
    CONTEXT
 ========================================================= */
 
-const AuthContext =
-  createContext(null);
+const AuthContext = createContext(null);
 
 /* =========================================================
    PROVIDER
@@ -293,44 +262,22 @@ export function AuthProvider({ children }) {
     if (!usuario) return;
 
     const renovar = () => {
-
       try {
-
-        const raw =
-          localStorage.getItem(SESSION_KEY);
-
+        const raw = localStorage.getItem(SESSION_KEY);
         if (raw) {
-
           const s = JSON.parse(raw);
-
-          s.expiraEm =
-            Date.now() +
-            SESSION_HOURS * 3600 * 1000;
-
-          localStorage.setItem(
-            SESSION_KEY,
-            JSON.stringify(s)
-          );
+          s.expiraEm = Date.now() + SESSION_HOURS * 3600 * 1000;
+          localStorage.setItem(SESSION_KEY, JSON.stringify(s));
         }
-
       } catch (_) {}
     };
 
     window.addEventListener('click', renovar);
-
     window.addEventListener('keydown', renovar);
 
     return () => {
-
-      window.removeEventListener(
-        'click',
-        renovar
-      );
-
-      window.removeEventListener(
-        'keydown',
-        renovar
-      );
+      window.removeEventListener('click', renovar);
+      window.removeEventListener('keydown', renovar);
     };
 
   }, [usuario]);
@@ -339,44 +286,30 @@ export function AuthProvider({ children }) {
      LOGIN
   ===================================================== */
 
-  const login = useCallback(async (
-    username,
-    password
-  ) => {
+  const login = useCallback(async (username, password) => {
 
     setCarregando(true);
 
     try {
 
-      const found =
-        await buscarUsuario(
-          username.trim(),
-          password
-        );
+      // Modo demo
+      if (username.trim().toLowerCase() === 'demo' && password === 'demo123') {
+        salvarSessao(DEMO_USER);
+        setUsuario(DEMO_USER);
+        return { ok: true };
+      }
+
+      // Google Sheets
+      const found = await buscarUsuario(username.trim(), password);
 
       if (!found) {
-
         return {
           ok: false,
           erro: 'Usuário ou senha incorretos.',
         };
       }
 
-      localStorage.setItem(
-        SESSION_KEY,
-        JSON.stringify({
-
-          usuario: found,
-
-          expiraEm:
-            Date.now() +
-            SESSION_HOURS * 3600 * 1000,
-
-          loginEm:
-            Date.now(),
-        })
-      );
-
+      salvarSessao(found);
       setUsuario(found);
 
       return { ok: true };
@@ -403,42 +336,23 @@ export function AuthProvider({ children }) {
 
     if (!usuario) return;
 
-    if (
-      !usuario.estoquesPermitidos.includes(novo)
-    ) {
-      return;
-    }
+    if (!usuario.estoquesPermitidos.includes(novo)) return;
 
     const atualizado = {
-
       ...usuario,
-
       estoqueAtual: novo,
-
-      sheetId:
-        CIDADES[novo]?.sheetId || null,
+      sheetId: usuario.demo ? 'demo' : (CIDADES[novo]?.sheetId || null),
     };
 
     setUsuario(atualizado);
 
     try {
-
-      const raw =
-        localStorage.getItem(SESSION_KEY);
-
+      const raw = localStorage.getItem(SESSION_KEY);
       if (raw) {
-
-        const sessao =
-          JSON.parse(raw);
-
+        const sessao = JSON.parse(raw);
         sessao.usuario = atualizado;
-
-        localStorage.setItem(
-          SESSION_KEY,
-          JSON.stringify(sessao)
-        );
+        localStorage.setItem(SESSION_KEY, JSON.stringify(sessao));
       }
-
     } catch (_) {}
 
   }, [usuario]);
@@ -448,13 +362,8 @@ export function AuthProvider({ children }) {
   ===================================================== */
 
   const logout = useCallback(() => {
-
-    localStorage.removeItem(
-      SESSION_KEY
-    );
-
+    localStorage.removeItem(SESSION_KEY);
     setUsuario(null);
-
   }, []);
 
   /* =====================================================
@@ -462,14 +371,8 @@ export function AuthProvider({ children }) {
   ===================================================== */
 
   const pode = useCallback((permissao) => {
-
     if (!usuario) return false;
-
-    return (
-      PERMISSOES[usuario.role]?.[permissao]
-      ?? false
-    );
-
+    return PERMISSOES[usuario.role]?.[permissao] ?? false;
   }, [usuario]);
 
   /* =====================================================
@@ -477,37 +380,21 @@ export function AuthProvider({ children }) {
   ===================================================== */
 
   return (
-
     <AuthContext.Provider
       value={{
-
         usuario,
-
         carregando,
-
         login,
-
         logout,
-
         pode,
-
         trocarEstoque,
-
         cidades: CIDADES,
-
-        isGerente:
-          usuario?.role === 'gerente',
-
-        isSupervisor:
-          usuario?.role === 'supervisor',
-
-        isAuxiliar:
-          usuario?.role === 'auxiliar',
+        isGerente: usuario?.role === 'gerente',
+        isSupervisor: usuario?.role === 'supervisor',
+        isAuxiliar: usuario?.role === 'auxiliar',
       }}
     >
-
       {children}
-
     </AuthContext.Provider>
   );
 }
@@ -518,11 +405,9 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
 
-  const ctx =
-    useContext(AuthContext);
+  const ctx = useContext(AuthContext);
 
   if (!ctx) {
-
     throw new Error(
       'useAuth deve ser usado dentro de <AuthProvider>'
     );

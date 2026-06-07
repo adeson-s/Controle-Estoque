@@ -370,7 +370,7 @@ export default function DetalheTecnico({ tecnico, onClose }) {
   const [periodo, setPeriodo] = useState(7);
   const [aba, setAba]         = useState('dashboard');
 
-  const nomeTec = tecnico?.['NOME COMPLETO'] || tecnico?.TÉCNICO || '';
+  const nomeTec = tecnico?.TÉCNICO || tecnico?.['NOME COMPLETO'] || '';
 const idTec   = tecnico?.ID;
   const placa   = tecnico?.PLACA   || '—';
   const status  = tecnico?.STATUS  || '—';
@@ -490,19 +490,6 @@ const todasP = useMemo(
             >✕</button>
           </div>
 
-          {/* Mini comparativo rápido no header 
-          <div style={{ position:'relative', zIndex:1, display:'flex', gap:0, paddingBottom:16 }}>
-            {[
-              { label: '7 dias', val: total7  },
-              { label: '15 dias', val: total15 },
-              { label: '30 dias', val: total30 },
-            ].map(({ label, val }) => (
-              <div key={label} style={{ flex:1, textAlign:'center', padding:'8px 0', borderRight:'1px solid rgba(255,255,255,0.1)', ':last-child':{ borderRight:'none' } }}>
-                <div style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'-0.03em' }}>{val}</div>
-                <div style={{ fontSize:10, color:'rgba(255,255,255,0.5)', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em', marginTop:1 }}>un. {label}</div>
-              </div>
-            ))}
-          </div>*/}
         </div>
 
         {/* ── Abas ── */}
@@ -537,48 +524,6 @@ const todasP = useMemo(
           {/* ═══════════════════════════════════════════════ ABA DASHBOARD */}
           {aba === 'dashboard' && (
             <>
-              {/* Cards de resumo 
-              <div style={s.statGrid}>
-                <div style={{ ...s.statCard, borderColor:'#185FA530', background:'#185FA508' }}>
-                  <div style={{ ...s.statVal, color:'#185FA5' }}>{totalUnidP}</div>
-                  <div style={{ ...s.statLabel, color:'#185FA5' }}>Unidades retiradas</div>
-                  <div style={s.statSub}>{totalItensP} retirada{totalItensP !== 1 ? 's' : ''} no período</div>
-                </div>
-                <div style={{ ...s.statCard, borderColor:'#1D9E7530', background:'#1D9E7508' }}>
-                  <div style={{ ...s.statVal, color:'#1D9E75' }}>{diasComMovP}</div>
-                  <div style={{ ...s.statLabel, color:'#1D9E75' }}>Dias com atividade</div>
-                  <div style={s.statSub}>Média {mediadiaria} un./dia</div>
-                </div>
-                <div style={{ ...s.statCard, borderColor:'#EF9F2730', background:'#EF9F2708' }}>
-                  <div style={{ ...s.statVal, color:'#EF9F27' }}>{topProdutos.length}</div>
-                  <div style={{ ...s.statLabel, color:'#EF9F27' }}>Produtos diferentes</div>
-                  <div style={s.statSub}>Mais usado: {nomeCurto(prodFav)}</div>
-                </div>
-              </div>
-*/}
-              {/* Gráfico de barras diário 
-              <div style={s.section}>
-                <div style={s.sectionHead}>
-                  <span style={s.sectionTitle}>📅 Retiradas por dia</span>
-                  <div style={s.sectionLine} />
-                </div>
-                <div style={s.chartBox}>
-                  {barData.some(d => d.qty > 0) ? (
-                    <>
-                      <BarChart data={barData} cor="#185FA5" altura={72} />
-                      <div style={s.chartLegend}>
-                        <span>{barData[0]?.label}</span>
-                        <span>Hoje</span>
-                      </div>
-                    </>
-                  ) : (
-                    <div style={{ padding:'24px', textAlign:'center', color:'#ccc', fontSize:12 }}>
-                      Nenhuma retirada nos últimos {periodo} dias
-                    </div>
-                  )}
-                </div>
-              </div>
-*/}
               {/* Distribuição de status */}
               <div style={s.section}>
                 <div style={s.sectionHead}>

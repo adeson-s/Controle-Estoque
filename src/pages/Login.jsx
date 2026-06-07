@@ -15,18 +15,25 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!username.trim()) {
-      return setErro('Preencha o usuário.');
-    }
-
-    if (!password) {
-      return setErro('Preencha a senha.');
-    }
+    if (!username.trim()) return setErro('Preencha o usuário.');
+    if (!password) return setErro('Preencha a senha.');
 
     setLoading(true);
     setErro('');
 
     const result = await login(username, password);
+
+    if (!result.ok) {
+      setErro(result.erro);
+      setLoading(false);
+    }
+  }
+
+  async function handleDemoLogin() {
+    setLoading(true);
+    setErro('');
+
+    const result = await login('demo', 'demo123');
 
     if (!result.ok) {
       setErro(result.erro);
@@ -230,6 +237,59 @@ export default function Login() {
           cursor: not-allowed;
         }
 
+        .demo-divider {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin: 18px 0 14px;
+          color: #ccc;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .demo-divider::before,
+        .demo-divider::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: #eee;
+        }
+
+        .btn-demo {
+          width: 100%;
+          padding: 11px;
+          border-radius: 10px;
+          border: 1.5px solid #e5e7eb;
+          background: #f9fafb;
+          color: #444;
+          font-size: 14px;
+          font-weight: 600;
+          font-family: 'DM Sans', system-ui, sans-serif;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: background 0.15s, border-color 0.15s;
+        }
+
+        .btn-demo:hover:not(:disabled) {
+          background: #f3f4f6;
+          border-color: #d1d5db;
+        }
+
+        .btn-demo:disabled {
+          opacity: 0.65;
+          cursor: not-allowed;
+        }
+
+        .demo-hint {
+          margin-top: 8px;
+          font-size: 11.5px;
+          color: #bbb;
+          text-align: center;
+        }
+
         .spinner {
           width: 16px;
           height: 16px;
@@ -239,10 +299,17 @@ export default function Login() {
           animation: spin 0.65s linear infinite;
         }
 
+        .spinner-dark {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(0,0,0,0.12);
+          border-top-color: #555;
+          border-radius: 50%;
+          animation: spin 0.65s linear infinite;
+        }
+
         @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
+          to { transform: rotate(360deg); }
         }
 
         .login-footer-note {
@@ -273,7 +340,6 @@ export default function Login() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
-
                   <polyline
                     points="9 22 9 12 15 12 15 22"
                     stroke="#0d1f14"
@@ -285,23 +351,13 @@ export default function Login() {
               </div>
 
               <div>
-                <div className="login-logo-name">
-                  Leste
-                </div>
-
-                <div className="login-logo-sub">
-                  Controle de Estoque
-                </div>
+                <div className="login-logo-name">AlmoxApp</div>
+                <div className="login-logo-sub">Controle de Estoque</div>
               </div>
             </div>
 
-            <div className="login-title">
-              Acesse o sistema
-            </div>
-
-            <div className="login-subtitle">
-              Entre com suas credenciais
-            </div>
+            <div className="login-title">Acesse o sistema</div>
+            <div className="login-subtitle">Entre com suas credenciais</div>
 
           </div>
 
@@ -311,16 +367,11 @@ export default function Login() {
             <form onSubmit={handleSubmit} noValidate>
 
               {erro && (
-                <div className="erro-msg">
-                  {erro}
-                </div>
+                <div className="erro-msg">{erro}</div>
               )}
 
               <div className="field">
-                <label htmlFor="u">
-                  Usuário
-                </label>
-
+                <label htmlFor="u">Usuário</label>
                 <div className="input-wrap">
                   <input
                     id="u"
@@ -328,20 +379,14 @@ export default function Login() {
                     autoComplete="username"
                     placeholder="seu.usuario"
                     value={username}
-                    onChange={(e) => {
-                      setUsername(e.target.value);
-                      setErro('');
-                    }}
+                    onChange={(e) => { setUsername(e.target.value); setErro(''); }}
                     disabled={loading}
                   />
                 </div>
               </div>
 
               <div className="field">
-                <label htmlFor="p">
-                  Senha
-                </label>
-
+                <label htmlFor="p">Senha</label>
                 <div className="input-wrap">
                   <input
                     id="p"
@@ -349,14 +394,10 @@ export default function Login() {
                     autoComplete="current-password"
                     placeholder="••••••••"
                     value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setErro('');
-                    }}
+                    onChange={(e) => { setPassword(e.target.value); setErro(''); }}
                     disabled={loading}
                     style={{ paddingRight: 40 }}
                   />
-
                   <button
                     type="button"
                     className="pass-toggle"
@@ -368,24 +409,35 @@ export default function Login() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="btn-entrar"
-                disabled={loading}
-              >
+              <button type="submit" className="btn-entrar" disabled={loading}>
                 {loading ? (
-                  <>
-                    <div className="spinner" />
-                    Verificando...
-                  </>
+                  <><div className="spinner" />Verificando...</>
                 ) : (
-                  <>
-                    Entrar
-                  </>
+                  <>Entrar</>
                 )}
               </button>
 
             </form>
+
+            {/* DEMO */}
+            <div className="demo-divider">ou</div>
+
+            <button
+              type="button"
+              className="btn-demo"
+              onClick={handleDemoLogin}
+              disabled={loading}
+            >
+              {loading ? (
+                <><div className="spinner-dark" />Carregando...</>
+              ) : (
+                <>&#9654; Acessar Demo</>
+              )}
+            </button>
+
+            <div className="demo-hint">
+              Explore o sistema sem cadastro · dados fictícios
+            </div>
 
             <div className="login-footer-note">
               Sistema restrito · Contate o administrador

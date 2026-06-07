@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { useApp } from '../AppContext';
 import PageHeader from '../components/PageHeader';
 import Modal from '../components/Modal';
-import SheetsService from '../services/SheetsService';
 import DetalheTecnico from '../components/DetalheTecnico';
 
 export default function Tecnicos() {
-const { dados } = useApp();
-const { tecnicos, movimentacoes } = dados;
+  const { dados, carregarDados, SheetsService } = useApp();
+  const { tecnicos, movimentacoes } = dados;
 
   const [showModal, setShowModal] = useState(false);
   const [modoEdicao, setModoEdicao] = useState(false);
@@ -16,12 +15,10 @@ const { tecnicos, movimentacoes } = dados;
   const [loading, setLoading] = useState(false);
 
 const getHistoricoTecnico = (tecnico) => {
-  return movimentacoes.filter(m => {
-    return (
-      m.ID_TECNICO == tecnico.TÉCNICO || 
-      m.NOME == tecnico['NOME COMPLETO'] // fallback (caso não tenha ID)
-    );
-  });
+  return movimentacoes.filter(m =>
+    m.TÉCNICO === tecnico.TÉCNICO ||
+    m.TÉCNICO === tecnico['NOME COMPLETO']
+  );
 };
 
   // ── Detalhe do técnico ──
