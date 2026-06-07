@@ -2,6 +2,8 @@
 
 Sistema de controle de almoxarifado para equipes de campo, desenvolvido com React + Vite. Suporta múltiplas filiais, controle de saídas por técnico, conferência de estoque, alertas de reposição e geração de relatórios.
 
+LINK almoxapp.vercel.app
+
 > **Modo demo disponível**.
 
 ---
